@@ -29,6 +29,11 @@ typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterFormat){
 @property (nonatomic, copy) NSString *countryCode; // 2 Letter Country Code. Default is NSLocale's currentLocale countryCode.
 @property (nonatomic, assign) MCSMTelephoneNumberFormatterFormat format; // Default is MCSMTelephoneNumberFormatterFormatNational.
 @property (nonatomic, assign) BOOL allowsPartialTelephoneNumbers; // Default is NO. Setting this to YES means that partial telephone numbers will be formatted.
+@property (nonatomic, assign) BOOL validatesTelephoneNumbers; // Default is NO. Setting this to YES means that telephone numbers are validated before formatting.
+
++ (instancetype)mainThreadPartialNationalFormatTelephoneNumberFormatter; // Singleton for formatting partial telphone numbers in national format on the Main Thread. Reduces the overhead of alloc/init an MCSMTelephoneNumberFormatter.
+
++ (instancetype)telephoneNumberFormatter;
 
 #pragma mark -
 #pragma mark - Formatting

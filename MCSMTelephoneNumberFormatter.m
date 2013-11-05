@@ -47,6 +47,21 @@
 
 @synthesize JSContext = _JSContext;
 
++ (instancetype)mainThreadPartialNationalFormatTelephoneNumberFormatter{
+    static MCSMTelephoneNumberFormatter *mainThreadNationalPartialTelephoneNumberFormatter = nil;
+    static dispatch_once_t predicate;
+    
+    dispatch_once(&predicate, ^{
+        mainThreadNationalPartialTelephoneNumberFormatter = [[MCSMTelephoneNumberFormatter alloc] init];
+        mainThreadNationalPartialTelephoneNumberFormatter.allowsPartialTelephoneNumbers = YES;
+    });
+    return mainThreadNationalPartialTelephoneNumberFormatter;
+}
+
++ (instancetype)telephoneNumberFormatter{
+    return [[MCSMTelephoneNumberFormatter alloc] init];
+}
+
 #pragma mark -
 #pragma mark - Initialization
 
@@ -110,37 +125,45 @@
     {
         if ([self allowsPartialTelephoneNumbers])
         {
-            NSString *scriptString =
-            @"function formatAsYouTypeNumber(input,countryCode) {\
-            var result = null;\
-            var formatter = new i18n.phonenumbers.AsYouTypeFormatter(countryCode);\
-            for (var i = 0; i < input.length; i++) {\
-            result = formatter.inputDigit(input.charAt(i));\
-            }\
-            return result;\
-            }\
-            formatAsYouTypeNumber(\"%1$@\",\"%2$@\");";
-            scriptString = [NSString stringWithFormat:scriptString, string, [self countryCode]];
-            result = [self _stringByEvaluatingScriptString:scriptString];
+            if((self.validatesTelephoneNumbers && [self isPossibleTelephoneNumber:string])
+               || !self.validatesTelephoneNumbers)
+            {
+                NSString *scriptString =
+                @"function formatAsYouTypeNumber(input,countryCode) {\
+                var result = null;\
+                var formatter = new i18n.phonenumbers.AsYouTypeFormatter(countryCode);\
+                for (var i = 0; i < input.length; i++) {\
+                result = formatter.inputDigit(input.charAt(i));\
+                }\
+                return result;\
+                }\
+                formatAsYouTypeNumber(\"%1$@\",\"%2$@\");";
+                scriptString = [NSString stringWithFormat:scriptString, string, [self countryCode]];
+                result = [self _stringByEvaluatingScriptString:scriptString];
+            }
 
         }
         else
         {
-            NSString *PNFFormat = [MCSMTelephoneNumberFormatter _PNFFormatForFormat:self.format];
+            if((self.validatesTelephoneNumbers && [self isValidTelephoneNumber:string])
+               || !self.validatesTelephoneNumbers)
+            {
+                NSString *PNFFormat = [MCSMTelephoneNumberFormatter _PNFFormatForFormat:self.format];
 
-            NSString *scriptString =
-            @"function formatNumber(input,countryCode) {\
-            var PNF = i18n.phonenumbers.PhoneNumberFormat;\
-            var phoneUtil = i18n.phonenumbers.PhoneNumberUtil.getInstance();\
-            var number = phoneUtil.parseAndKeepRawInput(input,countryCode);\
-            var region = phoneUtil.getRegionCodeForNumber(number);\
-            var type = (region == countryCode || region == null) ? PNF.%3$@ : PNF.INTERNATIONAL;\
-            return phoneUtil.format(number, type);\
-            }\
-            formatNumber(\"%1$@\", \"%2$@\");";
+                NSString *scriptString =
+                @"function formatNumber(input,countryCode) {\
+                var PNF = i18n.phonenumbers.PhoneNumberFormat;\
+                var phoneUtil = i18n.phonenumbers.PhoneNumberUtil.getInstance();\
+                var number = phoneUtil.parseAndKeepRawInput(input,countryCode);\
+                var region = phoneUtil.getRegionCodeForNumber(number);\
+                var type = (region == countryCode || region == null) ? PNF.%3$@ : PNF.INTERNATIONAL;\
+                return phoneUtil.format(number, type);\
+                }\
+                formatNumber(\"%1$@\", \"%2$@\");";
 
-            scriptString = [NSString stringWithFormat:scriptString, string, [self countryCode], PNFFormat];
-            result = [self _stringByEvaluatingScriptString:scriptString];
+                scriptString = [NSString stringWithFormat:scriptString, string, [self countryCode], PNFFormat];
+                result = [self _stringByEvaluatingScriptString:scriptString];
+            }
         }
 
     }
