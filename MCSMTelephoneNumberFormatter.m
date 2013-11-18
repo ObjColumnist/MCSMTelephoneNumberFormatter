@@ -17,7 +17,7 @@
 //
 
 #import "MCSMTelephoneNumberFormatter.h"
-#import <JavaScriptCore/JavaScriptCore.h>
+@import JavaScriptCore;
 
 @interface MCSMTelephoneNumberFormatter ()
 
@@ -47,15 +47,27 @@
 
 @synthesize JSContext = _JSContext;
 
-+ (instancetype)mainThreadPartialNationalFormatTelephoneNumberFormatter{
-    static MCSMTelephoneNumberFormatter *mainThreadNationalPartialTelephoneNumberFormatter = nil;
-    static dispatch_once_t predicate;
++ (NSString *)partialNationalFormatTelephoneNumberFromString:(NSString *)string{
     
-    dispatch_once(&predicate, ^{
-        mainThreadNationalPartialTelephoneNumberFormatter = [[MCSMTelephoneNumberFormatter alloc] init];
-        mainThreadNationalPartialTelephoneNumberFormatter.allowsPartialTelephoneNumbers = YES;
-    });
-    return mainThreadNationalPartialTelephoneNumberFormatter;
+    if([[NSThread mainThread] isMainThread])
+    {
+        static MCSMTelephoneNumberFormatter *mainThreadPartialNationalFormatTelephoneNumberFormatter = nil;
+        static dispatch_once_t predicate;
+        
+        dispatch_once(&predicate, ^{
+            mainThreadPartialNationalFormatTelephoneNumberFormatter = [[MCSMTelephoneNumberFormatter alloc] init];
+            mainThreadPartialNationalFormatTelephoneNumberFormatter.allowsPartialTelephoneNumbers = YES;
+        });
+        
+        return [mainThreadPartialNationalFormatTelephoneNumberFormatter telephoneNumberFromString:string];
+    }
+    else
+    {
+        MCSMTelephoneNumberFormatter *telephoneNumberFormatter = [[MCSMTelephoneNumberFormatter alloc] init];
+        telephoneNumberFormatter.allowsPartialTelephoneNumbers = YES;
+    
+        return [telephoneNumberFormatter telephoneNumberFromString:string];
+    }
 }
 
 + (instancetype)telephoneNumberFormatter{

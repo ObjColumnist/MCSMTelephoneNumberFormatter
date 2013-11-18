@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterFormat){
     MCSMTelephoneNumberFormatterFormatNational,
@@ -31,7 +31,7 @@ typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterFormat){
 @property (nonatomic, assign) BOOL allowsPartialTelephoneNumbers; // Default is NO. Setting this to YES means that partial telephone numbers will be formatted.
 @property (nonatomic, assign) BOOL validatesTelephoneNumbers; // Default is NO. Setting this to YES means that telephone numbers are validated before formatting.
 
-+ (instancetype)mainThreadPartialNationalFormatTelephoneNumberFormatter; // Singleton for formatting partial telphone numbers in national format on the Main Thread. Reduces the overhead of alloc/init an MCSMTelephoneNumberFormatter.
++ (NSString *)partialNationalFormatTelephoneNumberFromString:(NSString *)string; // Reduces the overhead of alloc/init a MCSMTelephoneNumberFormatter when used on the Main Thread.
 
 + (instancetype)telephoneNumberFormatter;
 
