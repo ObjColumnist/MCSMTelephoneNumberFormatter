@@ -45,6 +45,7 @@ typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterTelephoneNumberType){
 @property (nonatomic, assign) MCSMTelephoneNumberFormatterFormat format; // Default is MCSMTelephoneNumberFormatterFormatNational.
 @property (nonatomic, assign) BOOL allowsPartialTelephoneNumbers; // Default is NO. Setting this to YES means that partial telephone numbers will be formatted.
 @property (nonatomic, assign) BOOL validatesTelephoneNumbers; // Default is NO. Setting this to YES means that telephone numbers are validated before formatting.
+@property (nonatomic, assign) BOOL returnsInvalidString; // Default is NO. Setting this to YES means that the string is returned if it is invalid instead of nil.
 
 + (NSString *)partialNationalFormatTelephoneNumberFromString:(NSString *)string; // Reduces the overhead of alloc/init a MCSMTelephoneNumberFormatter when used on the Main Thread.
 

@@ -57,6 +57,8 @@
         dispatch_once(&predicate, ^{
             mainThreadPartialNationalFormatTelephoneNumberFormatter = [[MCSMTelephoneNumberFormatter alloc] init];
             mainThreadPartialNationalFormatTelephoneNumberFormatter.allowsPartialTelephoneNumbers = YES;
+            mainThreadPartialNationalFormatTelephoneNumberFormatter.validatesTelephoneNumbers = YES;
+            mainThreadPartialNationalFormatTelephoneNumberFormatter.returnsInvalidString = YES;
         });
         
         return [mainThreadPartialNationalFormatTelephoneNumberFormatter telephoneNumberFromString:string];
@@ -65,6 +67,8 @@
     {
         MCSMTelephoneNumberFormatter *telephoneNumberFormatter = [MCSMTelephoneNumberFormatter telephoneNumberFormatter];
         telephoneNumberFormatter.allowsPartialTelephoneNumbers = YES;
+        telephoneNumberFormatter.validatesTelephoneNumbers = YES;
+        telephoneNumberFormatter.returnsInvalidString = YES;
     
         return [telephoneNumberFormatter telephoneNumberFromString:string];
     }
@@ -131,7 +135,7 @@
 
     NSString *result = nil;
 
-    string = [MCSMTelephoneNumberFormatter _escapedTelephoneNumberForTelephoneNumber:string];
+    NSString *escapedString = [MCSMTelephoneNumberFormatter _escapedTelephoneNumberForTelephoneNumber:string];
 
     if ([string length] > 0)
     {
@@ -150,7 +154,7 @@
                 return result;\
                 }\
                 formatAsYouTypeNumber(\"%1$@\",\"%2$@\");";
-                scriptString = [NSString stringWithFormat:scriptString, string, [self countryCode]];
+                scriptString = [NSString stringWithFormat:scriptString, escapedString, [self countryCode]];
                 result = [self _stringByEvaluatingScriptString:scriptString];
             }
 
@@ -173,14 +177,21 @@
                 }\
                 formatNumber(\"%1$@\", \"%2$@\");";
 
-                scriptString = [NSString stringWithFormat:scriptString, string, [self countryCode], PNFFormat];
+                scriptString = [NSString stringWithFormat:scriptString, escapedString, [self countryCode], PNFFormat];
                 result = [self _stringByEvaluatingScriptString:scriptString];
             }
         }
 
     }
 
-    return result;
+    if(!result && self.returnsInvalidString)
+    {
+        return string;
+    }
+    else
+    {
+        return result;
+    }
 }
 
 - (NSString *)stringFromTelephoneNumber:(NSString *)telephoneNumber{
