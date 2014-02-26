@@ -20,7 +20,7 @@ system("unzip -o -d #{@build_directory_path} #{@build_directory_path}/compiler-l
 # Change to Build Directory
 Dir.chdir(@build_directory_path)
 
-#Compile libphonenumber
+# Compile libphonenumber
 cmd = "closure-library/closure/bin/build/closurebuilder.py " \
       "--root=closure-library "\
       "--namespace=\"i18n.phonenumbers.PhoneNumberUtil\" " \

@@ -24,9 +24,24 @@ typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterFormat){
     MCSMTelephoneNumberFormatterFormatE164
 };
 
+typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterTelephoneNumberType){
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeUnknown,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeFixedLine,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeMobile,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeFixedLineOrMobile,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeTollFree,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypePremiumRate,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeSharedCost,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeVoIP,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypePersonal,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypePager,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeUAN,
+    MCSMTelephoneNumberFormatterTelephoneNumberTypeVoicemail
+};
+
 @interface MCSMTelephoneNumberFormatter : NSFormatter
 
-@property (nonatomic, copy) NSString *countryCode; // 2 Letter Country Code. Default is NSLocale's currentLocale countryCode.
+@property (nonatomic, copy) NSString *countryCode; // 2 Letter Country Code e.g. US. Default is NSLocale's currentLocale countryCode.
 @property (nonatomic, assign) MCSMTelephoneNumberFormatterFormat format; // Default is MCSMTelephoneNumberFormatterFormatNational.
 @property (nonatomic, assign) BOOL allowsPartialTelephoneNumbers; // Default is NO. Setting this to YES means that partial telephone numbers will be formatted.
 @property (nonatomic, assign) BOOL validatesTelephoneNumbers; // Default is NO. Setting this to YES means that telephone numbers are validated before formatting.
@@ -42,6 +57,11 @@ typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterFormat){
 - (NSString *)stringFromTelephoneNumber:(NSString *)telephoneNumber;
 
 #pragma mark -
+#pragma mark - Telephone Number Type
+
+- (MCSMTelephoneNumberFormatterTelephoneNumberType)telephoneNumberTypeForTelephoneNumber:(NSString *)telephoneNumber;
+
+#pragma mark -
 #pragma mark - Validation
 
 - (BOOL)isPossibleTelephoneNumber:(NSString *)telephoneNumber; // Estimates if a telephone number is possible based on its length. This is significantly faster than isValidTelephoneNumber:.
@@ -50,6 +70,6 @@ typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterFormat){
 #pragma mark -
 #pragma mark - Geocoding
 
-- (NSString *)countryCodeForTelephoneNumber:(NSString *)telephoneNumber; // Returns a 2 Letter Country Code or nil.
+- (NSString *)countryCodeForTelephoneNumber:(NSString *)telephoneNumber; // Returns a 2 Letter Country Code e.g. US or nil.
 
 @end

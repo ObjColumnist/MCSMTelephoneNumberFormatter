@@ -63,7 +63,7 @@
     }
     else
     {
-        MCSMTelephoneNumberFormatter *telephoneNumberFormatter = [[MCSMTelephoneNumberFormatter alloc] init];
+        MCSMTelephoneNumberFormatter *telephoneNumberFormatter = [MCSMTelephoneNumberFormatter telephoneNumberFormatter];
         telephoneNumberFormatter.allowsPartialTelephoneNumbers = YES;
     
         return [telephoneNumberFormatter telephoneNumberFromString:string];
@@ -185,6 +185,78 @@
 
 - (NSString *)stringFromTelephoneNumber:(NSString *)telephoneNumber{
     return telephoneNumber;
+}
+
+#pragma mark -
+#pragma mark - Telephone Number Type
+
+- (MCSMTelephoneNumberFormatterTelephoneNumberType)telephoneNumberTypeForTelephoneNumber:(NSString *)telephoneNumber{
+    
+    MCSMTelephoneNumberFormatterTelephoneNumberType result = MCSMTelephoneNumberFormatterTelephoneNumberTypeUnknown;
+    
+    telephoneNumber = [MCSMTelephoneNumberFormatter _escapedTelephoneNumberForTelephoneNumber:telephoneNumber];
+    
+    if([telephoneNumber length])
+    {
+        NSString *scriptString =
+        @"function typeForNumber(input,countryCode) {\
+        var PNF = i18n.phonenumbers.PhoneNumberFormat;\
+        var phoneUtil = i18n.phonenumbers.PhoneNumberUtil.getInstance();\
+        var number = phoneUtil.parseAndKeepRawInput(input, countryCode);\
+        return phoneUtil.getNumberType(number);\
+        }\
+        typeForNumber(\"%1$@\",\"%2$@\");";
+        
+        scriptString = [NSString stringWithFormat:scriptString, telephoneNumber, [self countryCode]];
+        NSString *type = [self _stringByEvaluatingScriptString:scriptString];
+        
+        if([type isEqualToString:@"0"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeFixedLine;
+        }
+        else if([type isEqualToString:@"1"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeMobile;
+        }
+        else if([type isEqualToString:@"2"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeFixedLineOrMobile;
+        }
+        else if([type isEqualToString:@"3"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeTollFree;
+        }
+        else if([type isEqualToString:@"4"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypePremiumRate;
+        }
+        else if([type isEqualToString:@"5"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeSharedCost;
+        }
+        else if([type isEqualToString:@"6"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeVoIP;
+        }
+        else if([type isEqualToString:@"7"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypePersonal;
+        }
+        else if([type isEqualToString:@"8"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypePager;
+        }
+        else if([type isEqualToString:@"9"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeUAN;
+        }
+        else if([type isEqualToString:@"10"])
+        {
+            result = MCSMTelephoneNumberFormatterTelephoneNumberTypeVoicemail;
+        }
+    }
+    
+    return result;
 }
 
 #pragma mark -
