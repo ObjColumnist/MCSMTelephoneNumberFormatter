@@ -47,7 +47,11 @@
 
 @synthesize JSContext = _JSContext;
 
-+ (NSString *)partialNationalFormatTelephoneNumberFromString:(NSString *)string{
++ (instancetype)telephoneNumberFormatter{
+    return [[MCSMTelephoneNumberFormatter alloc] init];
+}
+
++ (NSString *)telephoneNumberForDisplayFromString:(NSString *)string{
     
     if([[NSThread mainThread] isMainThread])
     {
@@ -72,10 +76,6 @@
     
         return [telephoneNumberFormatter telephoneNumberFromString:string];
     }
-}
-
-+ (instancetype)telephoneNumberFormatter{
-    return [[MCSMTelephoneNumberFormatter alloc] init];
 }
 
 #pragma mark -

@@ -47,9 +47,9 @@ typedef NS_ENUM(NSUInteger, MCSMTelephoneNumberFormatterTelephoneNumberType){
 @property (nonatomic, assign) BOOL validatesTelephoneNumbers; // Default is NO. Setting this to YES means that telephone numbers are validated before formatting.
 @property (nonatomic, assign) BOOL returnsInvalidString; // Default is NO. Setting this to YES means that the string is returned if it is invalid instead of nil.
 
-+ (NSString *)partialNationalFormatTelephoneNumberFromString:(NSString *)string; // Reduces the overhead of alloc/init a MCSMTelephoneNumberFormatter when used on the Main Thread.
-
 + (instancetype)telephoneNumberFormatter;
+
++ (NSString *)telephoneNumberForDisplayFromString:(NSString *)string; // Optimised API for Implementing "As You Type" Functionality e.g. a Dialer.
 
 #pragma mark -
 #pragma mark - Formatting
